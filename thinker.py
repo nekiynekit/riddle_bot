@@ -10,7 +10,9 @@ class RuT5SmallModel(object):
         self.ans_pref = 'я думаю отгадка - '
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = load('trained_lm.pth')
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+        self.model.load_state_dict(load('trained_lm.pth'))
+        self.model.eval()
 
     def preprocess_function(self, examples):
         inputs = [self.prefix + doc or '' for doc in examples["riddle"]]
@@ -21,7 +23,7 @@ class RuT5SmallModel(object):
         return model_inputs
 
     def guess_the_riddle(self, sample):
-        tokens = self.tokenizer('guess: ' + sample, return_tensors='pt').input_ids
+        tokens = self.tokenizer(self.prefix + sample, return_tensors='pt').input_ids
         outputs = self.model.generate(tokens)
         prediction = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         return prediction

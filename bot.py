@@ -33,7 +33,12 @@ async def guess_the_ridlde(message: types.Message):
         global current_thinker
         current_thinker = RuT5SmallModel()
         await message.reply('Вы играете в загадки с rut5-small!')
-    await message.reply(f'{message.text} - 42!')
+    else:
+        try:
+            answer = current_thinker.guess_the_riddle(riddle)
+            await message.reply(answer)
+        except Exception as error:
+            await message.reply(f'Ошибка: {error}')
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
